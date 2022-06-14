@@ -2,20 +2,23 @@
 
 *By: Sayak Paul and [Chansung Park](https://github.com/deep-diver)*
 
-This project shows how to serve an ONNX-optimized image classification model as a
+This project shows how to serve a TensorFlow image classification model as a
 RESTful web service with FastAPI, Docker, and Kubernetes (k8s). The idea is to first
 Dockerize the API and then deploy it on a k8s cluster running on [Google Kubernetes
 Engine (GKE)](https://cloud.google.com/kubernetes-engine). We do this integration
 using [GitHub Actions](https://github.com/features/actions). 
 
 👋 **Note**: Even though this project uses an image classification its structure and techniques can
-be used to serve other models as well. We also worked on a TF Serving equivalent
-of this project. Check it out [here](https://github.com/deep-diver/ml-deployment-k8s-tfserving).
+be used to serve other models as well. We worked on the following related components of this project
+and provide them as standalone repositories:
+
+* Deployment with TensorFlow Serving: https://github.com/deep-diver/ml-deployment-k8s-tfserving
+* Deployment with ONNX and TensorFlow: https://github.com/sayakpaul/ml-deployment-k8s-fastapi
 
 ## Deploying the model as a service with k8s
 
-* We decouple the model optimization part from our API code. The optimization part is
-available within the `notebooks/TF_to_ONNX.ipynb` notebook.
+* We decouple the model building part from our API code. Refer to the `notebooks/TF_Serving.ipynb`
+notebook to know more about how the model was built.
 * Then we locally test the API. You can find the instructions within the `api`
 directory.
 * To deploy the API, we define our `deployment.yaml` workflow file inside `.github/workflows`.
@@ -62,9 +65,6 @@ final outputs should look like so ([run link](https://github.com/sayakpaul/ml-de
 
 ## Notes
 
-* Since we use CPU-based pods within the k8s cluster, we use ONNX optimizations
-  since they are known to provide performance speed-ups for CPU-based environments.
-  If you are using GPU-based pods then look into [TensorRT](https://developer.nvidia.com/tensorrt). 
 * We use [Kustomize](https://kustomize.io) to manage the deployment on k8s.
 * We conducted load-testing varying the number of workers, RAM, nodes, etc. From that experiment,
   we found out that for our setup, 8 nodes each having 2 vCPUs and 4 GBs of work the best in terms of 
