@@ -6,17 +6,18 @@ Adapted from:
 """
 
 import json
+import tarfile
 import urllib.request
 
-import onnxruntime as ort
-from fastapi import FastAPI, File, Form, HTTPException
+from tensorflow.keras.models import load_model
 
+from fastapi import FastAPI, File, Form, HTTPException
 from utils import decode_predictions, get_latest_model_url, prepare_image
 
 app = FastAPI(title="ONNX image classification API")
 
-MODEL_FN = "resnet50_w_preprocessing.onnx"
-DEFAULT_MODEL_URL = f"https://github.com/sayakpaul/ml-deployment-k8s-fastapi/releases/download/v1.0.0/{MODEL_FN}"
+MODEL_FN = "resnet50_w_preprocessing_tf"
+DEFAULT_MODEL_URL = f"https://github.com/deep-diver/ml-deployment-k8s-fastapi/releases/download/v1.0.0/{MODEL_FN}.tar.gz"
 
 
 @app.get("/")
@@ -30,12 +31,15 @@ def load_modules():
 
     # If there's no latest ONNX model released fall back to the default model.
     if model_url is not None:
-        urllib.request.urlretrieve(model_url, MODEL_FN)
+        urllib.request.urlretrieve(model_url, f'{MODEL_FN}.tar.gz')
     else:
-        urllib.request.urlretrieve(DEFAULT_MODEL_URL, MODEL_FN)
+        urllib.request.urlretrieve(DEFAULT_MODEL_URL, f'{MODEL_FN}.tar.gz')
 
-    global resnet_model_sess
-    resnet_model_sess = ort.InferenceSession(MODEL_FN)
+    file = tarfile.open(f'{MODEL_FN}.tar.gz')
+    file.extractall('./')
+
+    global resnet_model
+    resnet_model = load_model(MODEL_FN)
 
     category_filename = "imagenet_classes.txt"
     category_url = f"https://raw.githubusercontent.com/pytorch/hub/master/{category_filename}"
@@ -59,7 +63,7 @@ async def predict_api(
             status_code=400, detail="Only 3-channel RGB images are supported."
         )
 
-    predictions = resnet_model_sess.run(None, {"image_input": image})[0]
+    predictions = resnet_model.predict(image)[0]
     if with_post_process:
         response_dict = decode_predictions(predictions, imagenet_categories)
         return json.dumps(response_dict)

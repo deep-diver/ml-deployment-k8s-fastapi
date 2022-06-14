@@ -131,3 +131,6 @@ dmypy.json
 # Misc
 .ipynb_checkpoints/
 *.onnx
+*.tar.gz
+/api/resnet50_w_preprocessing
+/api/resnet50_w_preprocessing_tf

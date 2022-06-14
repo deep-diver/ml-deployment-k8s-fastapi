@@ -16,14 +16,14 @@ def get_latest_model_url() -> str:
     """Gets the model download URL from the latest release artifacts."""
     g = Github()
 
-    repo = g.get_repo("sayakpaul/ml-deployment-k8s-fastapi")
+    repo = g.get_repo("deep-diver/ml-deployment-k8s-fastapi")
     latest_release = repo.get_latest_release()
     assets = list(latest_release.get_assets())
 
     download_url = None
 
     for asset in assets:
-        if "onnx" in asset.name:
+        if "_tf" in asset.name:
             asset_url = asset.url
             r = requests.get(asset_url)
             response = json.loads(r.text)
