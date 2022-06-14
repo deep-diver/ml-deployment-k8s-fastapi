@@ -1,4 +1,4 @@
-This directory exposes the ONNX model we converted in [this notebook](https://github.com/sayakpaul/ml-deployment-k8s-fastapi/blob/main/notebooks/TF_to_ONNX.ipynb) as a REST API using [FastAPI](https://fastapi.tiangolo.com/).
+This directory exposes a TensorFlow model we demo'd in [this notebook](https://github.com/sayakpaul/ml-deployment-k8s-fastapi/blob/main/notebooks/TF_Serving.ipynb) as a REST API using [FastAPI](https://fastapi.tiangolo.com/).
 
 ## Setup 
 
